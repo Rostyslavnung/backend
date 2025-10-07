@@ -13,6 +13,56 @@ class BaseEntity:
     def _display(self):
         raise NotImplementedError("Subclasses must implement this method")
 
+class BaseList:
+    def __init__(self):
+        self._items = []
+
+    def add(self, item):
+        if not isinstance(item, BaseEntity):
+            raise TypeError("Item must be a subclass of BaseEntity")
+        self._items.append(item)
+
+    def get_by_id(self, id):
+        for item in self._items:
+            if item.id == id:
+                return item
+        return None
+
+    def update(self, id, **kwargs):
+        item = self.get_by_id(id)
+        if item:
+            item.update(**kwargs)
+            return True
+        return False
+
+    def delete(self, id):
+        item = self.get_by_id(id)
+        if item:
+            self._items.remove(item)
+            return True
+        return False
+
+    def get_all(self):
+        return self._items
+
+    def __str__(self):
+        return "\n".join(str(item) for item in self._items)
+
+class KettleList(BaseList):
+    pass
+
+class ProducerList(BaseList):
+    pass
+
+class ColorList(BaseList):
+    pass
+
+class MaterialList(BaseList):
+    pass
+
+class KettleTypeList(BaseList):
+    pass
+
 class Kettle(BaseEntity):
     def __init__(self, id, model_code, name, 
                  producer_id, kettle_type_id, material_id, color_id, 
@@ -148,12 +198,19 @@ class Producer(BaseEntity):
 
 kettle = Kettle(1, "X123", "SuperKettle", 101, 5, 3, 2, 1.5, 24, 49.99, 25, 1.2, 20, 15)
 
+kettles = KettleList()
+producers = ProducerList()
 
-@app.route('/')
-def display_kettle():
-    return str(kettle)
+kettles.add(Kettle(1, "X123", "SuperKettle", 101, 5, 3, 2, 1.5, 24, 49.99, 25, 1.2, 20, 15))
+kettles.add(Kettle(2, "A456", "QuickBoil", 102, 6, 4, 1, 2.0, 12, 39.99, 23, 1.1, 19, 14))
 
-@app.route('/kettle')
-def dkettle():
-    kettle.update(price=44.99, color_id=4)
-    return str(kettle)
+producers.add(Producer(101, "Philips"))
+producers.add(Producer(102, "Bosch"))
+
+@app.route('/kettles')
+def get_all_kettles():
+    return jsonify([str(k) for k in kettles.get_all()])
+
+@app.route('/producers')
+def get_all_producers():
+    return jsonify([str(p) for p in producers.get_all()])
