@@ -4,6 +4,7 @@ from app.ProducerList import ProducerList
 from app.KettleTypeList import KettleTypeList
 from app.ColorList import ColorList
 from app.MaterialList import MaterialList
+import requests
 
 api = Blueprint('api', __name__)
     
@@ -70,3 +71,8 @@ def get_materials_xml():
     materials = MaterialList()
     materials.read_from_csv('app/data/materials.csv')
     return materials.get_as_xml()
+
+@api.route('/curl')
+def curl():
+    response = requests.get('http://localhost:5000/api/getKettlesJSON')
+    return jsonify(response.json())
