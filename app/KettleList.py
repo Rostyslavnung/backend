@@ -25,3 +25,7 @@ class KettleList(BaseList):
                         float(row[13])       # depth
                     )
                     self.add(kettle)
+
+    def get_as_xml(self):
+        xml_items = [item.get_as_xml() for item in self._items]
+        return "<kettles>\n" + "\n".join(xml_items) + "\n</kettles>"

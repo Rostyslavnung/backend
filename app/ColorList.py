@@ -10,3 +10,7 @@ class ColorList(BaseList):
                 if len(row) >= 2:
                     color = Color(int(row[0]), row[1])
                     self.add(color)
+
+    def get_as_xml(self):
+        xml_items = [item.get_as_xml() for item in self._items]
+        return "<colors>\n" + "\n".join(xml_items) + "\n</colors>"

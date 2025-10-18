@@ -14,3 +14,6 @@ class Producer(BaseEntity):
 
     def get_as_indexed_array(self):
         return [self.id, self.__name]
+    
+    def get_as_xml(self):
+        return f"<producer><id>{self.id}</id><name>{self.__name}</name></producer>"

@@ -14,3 +14,6 @@ class Material(BaseEntity):
 
     def get_as_indexed_array(self):
         return [self.id, self.__name]
+    
+    def get_as_xml(self):
+        return f"<material><id>{self.id}</id><name>{self.__name}</name></material>"

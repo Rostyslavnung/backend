@@ -10,3 +10,7 @@ class KettleTypeList(BaseList):
                 if len(row) >= 2:
                     kettle_type = KettleType(int(row[0]), row[1])
                     self.add(kettle_type)
+
+    def get_as_xml(self):        
+        xml_items = [item.get_as_xml() for item in self._items]
+        return "<kettle_types>\n" + "\n".join(xml_items) + "\n</kettle_types>"

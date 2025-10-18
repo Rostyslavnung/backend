@@ -6,8 +6,11 @@ from app.ProducerList import ProducerList
 from app.KettleTypeList import KettleTypeList
 from app.ColorList import ColorList
 from app.MaterialList import MaterialList
+from app.api.api import api
 
 app = Flask(__name__)
+
+app.register_blueprint(api, url_prefix='/api')
 
 kettles = KettleList()
 producers = ProducerList()
@@ -27,7 +30,7 @@ materials.read_from_csv('app/data/materials.csv')
 
 @app.route('/kettles')
 def get_all_kettles():
-    return jsonify([str(k) for k in kettles.get_all()])
+    return kettles.get_as_xml()
 
 @app.route('/producers')
 def get_all_producers():

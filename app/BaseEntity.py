@@ -11,3 +11,6 @@ class BaseEntity:
     
     def get_as_indexed_array(self):
         raise NotImplementedError("Subclasses must implement this method")
+    
+    def get_as_xml(self):
+        raise NotImplementedError("Subclasses must implement this method")

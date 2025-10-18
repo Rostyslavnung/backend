@@ -78,3 +78,21 @@ class Kettle(BaseEntity):
             self._length,
             self._width
         ]
+    
+    def get_as_xml(self):
+        return (f"<kettle>"
+                f"<id>{self.id}</id>"
+                f"<model_code>{self._model_code}</model_code>"
+                f"<name>{self._name}</name>"
+                f"<producer_id>{self._producer_id}</producer_id>"
+                f"<kettle_type_id>{self._kettle_type_id}</kettle_type_id>"
+                f"<material_id>{self._material_id}</material_id>"
+                f"<color_id>{self._color_id}</color_id>"
+                f"<capacity>{self._capacity}</capacity>"
+                f"<warranty_months>{self._warranty_months}</warranty_months>"
+                f"<price>{self._price}</price>"
+                f"<height>{self._height}</height>"
+                f"<weight>{self._weight}</weight>"
+                f"<length>{self._length}</length>"
+                f"<width>{self._width}</width>"
+                f"</kettle>")

@@ -11,3 +11,6 @@ class ProducerList(BaseList):
                     producer = Producer(int(row[0]), row[1])
                     self.add(producer)
 
+    def get_as_xml(self):
+        xml_items = [item.get_as_xml() for item in self._items]
+        return "<producers>\n" + "\n".join(xml_items) + "\n</producers>"
