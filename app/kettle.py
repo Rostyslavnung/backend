@@ -96,3 +96,21 @@ class Kettle(BaseEntity):
                 f"<length>{self._length}</length>"
                 f"<width>{self._width}</width>"
                 f"</kettle>")
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "model_code": self._model_code,
+            "name": self._name,
+            "producer_id": self._producer_id,
+            "kettle_type_id": self._kettle_type_id,
+            "material_id": self._material_id,
+            "color_id": self._color_id,
+            "capacity": self._capacity,
+            "warranty_months": self._warranty_months,
+            "price": self._price,
+            "height": self._height,
+            "weight": self._weight,
+            "length": self._length,
+            "width": self._width
+        }

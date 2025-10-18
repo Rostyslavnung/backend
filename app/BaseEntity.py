@@ -14,3 +14,6 @@ class BaseEntity:
     
     def get_as_xml(self):
         raise NotImplementedError("Subclasses must implement this method")
+    
+    def to_dict(self):
+        raise NotImplementedError("Subclasses must implement this method")

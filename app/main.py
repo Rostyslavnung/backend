@@ -1,51 +1,11 @@
-from flask import Flask, jsonify
+from flask import Flask, render_template
 
-from app.Color import Color
-from app.KettleList import KettleList
-from app.ProducerList import ProducerList
-from app.KettleTypeList import KettleTypeList
-from app.ColorList import ColorList
-from app.MaterialList import MaterialList
 from app.api.api import api
 
 app = Flask(__name__)
 
 app.register_blueprint(api, url_prefix='/api')
 
-kettles = KettleList()
-producers = ProducerList()
-kettle_types = KettleTypeList()
-colors = ColorList()
-materials = MaterialList()
-
-kettles.read_from_csv('app/data/kettles.csv')
-
-producers.read_from_csv('app/data/producers.csv')
-
-kettle_types.read_from_csv('app/data/kettleTypes.csv')
-
-colors.read_from_csv('app/data/colors.csv')
-
-materials.read_from_csv('app/data/materials.csv')
-
-@app.route('/kettles')
-def get_all_kettles():
-    return kettles.get_as_xml()
-
-@app.route('/producers')
-def get_all_producers():
-    return jsonify([str(p) for p in producers.get_all()])
-
-@app.route('/kettle_types')
-def get_all_kettle_types():
-    return jsonify([str(kt) for kt in kettle_types.get_all()])
-
-@app.route('/colors')
-def get_all_colors():
-    colors.add(Color(1, "Red"))
-    colors.write_to_csv('app/data/colors.csv')
-    return jsonify([str(c) for c in colors.get_all()])
-
-@app.route('/materials')
-def get_all_materials():
-    return jsonify([str(m) for m in materials.get_all()])
+@app.route('/')
+def index():
+    return render_template('index.html')

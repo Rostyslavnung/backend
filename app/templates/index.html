@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My App</title>
+</head>
+<body>
+    <script>
+        fetch('http://localhost:5000/api/getKettlesJSON')
+  .then(response => response.json()) // or response.text(), etc.
+  .then(data => {
+    let content=``;
+    for (let i=0;i<data.kettles.length;i++){
+        content+=`
+            Чайник `+data.kettles[i].producer_id+` `+data.kettles[i].model_code+` `+data.kettles[i].name+`</br>
+            Ціна: `+data.kettles[i].price+`</br>
+        `;
+        console.log(content);
+        for (const key in data.kettles[i].properties) {
+            content+=`${key}: ${data.kettles[i].properties[key]} </br>`;
+        }
+        
+    }
+    
+    document.getElementById('content').innerHTML=content;
+  })
+  .catch(error => console.error('Error:', error));
+    </script>
+</body>
+</html>

@@ -17,3 +17,6 @@ class Color(BaseEntity):
     
     def get_as_xml(self):
         return f"<color><id>{self.id}</id><name>{self.__name}</name></color>"
+    
+    def to_dict(self):
+        return {"id": self.id, "name": self.__name}

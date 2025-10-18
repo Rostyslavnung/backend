@@ -17,3 +17,6 @@ class KettleType(BaseEntity):
     
     def get_as_xml(self):
         return f"<kettle_type><id>{self.id}</id><name>{self.__name}</name></kettle_type>"
+    
+    def to_dict(self):
+        return {"id": self.id, "name": self.__name}

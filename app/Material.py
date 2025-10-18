@@ -17,3 +17,6 @@ class Material(BaseEntity):
     
     def get_as_xml(self):
         return f"<material><id>{self.id}</id><name>{self.__name}</name></material>"
+    
+    def to_dict(self):
+        return {"id": self.id, "name": self.__name}
