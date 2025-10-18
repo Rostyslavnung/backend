@@ -1,5 +1,6 @@
 from flask import Flask, jsonify
 
+from app.Color import Color
 from app.KettleList import KettleList
 from app.ProducerList import ProducerList
 from app.KettleTypeList import KettleTypeList
@@ -38,6 +39,8 @@ def get_all_kettle_types():
 
 @app.route('/colors')
 def get_all_colors():
+    colors.add(Color(1, "Red"))
+    colors.write_to_csv('app/data/colors.csv')
     return jsonify([str(c) for c in colors.get_all()])
 
 @app.route('/materials')

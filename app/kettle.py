@@ -60,3 +60,21 @@ class Kettle(BaseEntity):
         for key, value in kwargs.items():
             if value is not None and hasattr(self, key):
                 setattr(self, key, value)
+
+    def get_as_indexed_array(self):
+        return [
+            self.id,
+            self._model_code,
+            self._name,
+            self._producer_id,
+            self._kettle_type_id,
+            self._material_id,
+            self._color_id,
+            self._capacity,
+            self._warranty_months,
+            self._price,
+            self._height,
+            self._weight,
+            self._length,
+            self._width
+        ]

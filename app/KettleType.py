@@ -11,3 +11,6 @@ class KettleType(BaseEntity):
     def update(self, name=None):
         if name is not None:
             self.__name = name
+
+    def get_as_indexed_array(self):
+        return [self.id, self.__name]

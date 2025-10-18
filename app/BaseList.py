@@ -34,3 +34,10 @@ class BaseList:
 
     def __str__(self):
         return "\n".join(str(item) for item in self._items)
+    
+    def write_to_csv(self, file_path):
+        import csv
+        with open(file_path, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            for item in self._items:
+                writer.writerow(item.get_as_indexed_array())

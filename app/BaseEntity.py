@@ -8,3 +8,6 @@ class BaseEntity:
     
     def _display(self):
         raise NotImplementedError("Subclasses must implement this method")
+    
+    def get_as_indexed_array(self):
+        raise NotImplementedError("Subclasses must implement this method")
