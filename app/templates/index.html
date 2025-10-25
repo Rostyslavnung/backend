@@ -13,14 +13,10 @@
     let content=``;
     for (let i=0;i<data.kettles.length;i++){
         content+=`
-            Чайник `+data.kettles[i].producer_id+` `+data.kettles[i].model_code+` `+data.kettles[i].name+`</br>
-            Ціна: `+data.kettles[i].price+`</br>
+            Чайник `+data.kettles[i].producer_id+` `+data.kettles[i].model_code+` `+data.kettles[i].name+`
+            Ціна: `+data.kettles[i].price+`
         `;
         console.log(content);
-        for (const key in data.kettles[i].properties) {
-            content+=`${key}: ${data.kettles[i].properties[key]} </br>`;
-        }
-        
     }
     
     document.getElementById('content').innerHTML=content;

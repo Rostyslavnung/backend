@@ -1,4 +1,4 @@
-from app.BaseEntity import BaseEntity
+from app.src import BaseEntity
 
 class BaseList:
     def __init__(self):
