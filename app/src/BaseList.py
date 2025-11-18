@@ -4,6 +4,10 @@ class BaseList:
     def __init__(self):
         self._items = []
 
+    @property
+    def items(self):
+        return self._items
+
     def add(self, item):
         if not isinstance(item, BaseEntity):
             raise TypeError("Item must be a subclass of BaseEntity")

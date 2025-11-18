@@ -5,6 +5,10 @@ class Material(BaseEntity):
         super().__init__(id)
         self.__name = name
 
+    @property
+    def name(self):
+        return self.__name
+
     def __str__(self):
         return f"Material ID: {self.id}, Name: {self.__name}"
     

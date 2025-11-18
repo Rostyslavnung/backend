@@ -8,6 +8,10 @@ class Producer(BaseEntity):
     def __str__(self):
         return f"Producer ID: {self.id}, Name: {self.__name}"
     
+    @property
+    def name(self):
+        return self.__name
+
     def update(self, name=None):
         if name is not None:
             self.__name = name

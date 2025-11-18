@@ -3,7 +3,7 @@ from app.src import BaseEntity
 class Kettle(BaseEntity):
     def __init__(self, id, model_code, name, 
                  producer_id, kettle_type_id, material_id, color_id, 
-                 capacity, warranty_months, price, height, weight, length, width):
+                 capacity, warranty_months, price):
         super().__init__(id)
         self._model_code = model_code
         self._name = name
@@ -14,10 +14,6 @@ class Kettle(BaseEntity):
         self._capacity = capacity
         self._warranty_months = warranty_months
         self._price = price
-        self._height = height
-        self._weight = weight
-        self._length = length
-        self._width = width
 
     @property
     def name(self):
@@ -53,8 +49,7 @@ class Kettle(BaseEntity):
         return (f"Kettle ID: {self.id}, Model Code: {self._model_code}, Name: {self._name}, "
                 f"Producer ID: {self._producer_id}, Kettle Type ID: {self._kettle_type_id}, "
                 f"Material ID: {self._material_id}, Color ID: {self._color_id}, Capacity: {self._capacity}L, "
-                f"Warranty: {self._warranty_months} months, Price: ${self._price}, "
-                f"Dimensions (HxWxL): {self._height}x{self._width}x{self._length} cm, Weight: {self._weight} kg")
+                f"Warranty: {self._warranty_months} months, Price: ${self._price}")
 
     def update(self, **kwargs):
         for key, value in kwargs.items():
@@ -73,10 +68,6 @@ class Kettle(BaseEntity):
             self._capacity,
             self._warranty_months,
             self._price,
-            self._height,
-            self._weight,
-            self._length,
-            self._width
         ]
     
     def get_as_xml(self):
@@ -91,10 +82,6 @@ class Kettle(BaseEntity):
                 f"<capacity>{self._capacity}</capacity>"
                 f"<warranty_months>{self._warranty_months}</warranty_months>"
                 f"<price>{self._price}</price>"
-                f"<height>{self._height}</height>"
-                f"<weight>{self._weight}</weight>"
-                f"<length>{self._length}</length>"
-                f"<width>{self._width}</width>"
                 f"</kettle>")
     
     def to_dict(self):
@@ -109,8 +96,4 @@ class Kettle(BaseEntity):
             "capacity": self._capacity,
             "warranty_months": self._warranty_months,
             "price": self._price,
-            "height": self._height,
-            "weight": self._weight,
-            "length": self._length,
-            "width": self._width
         }

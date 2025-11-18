@@ -3,25 +3,21 @@ import csv
 
 class KettleList(BaseList):
     def read_from_csv(self, filename):
-        with open(filename, mode='r', newline='', encoding='utf-8') as file:
+        with open(filename, newline='', encoding='utf-8') as file:
             reader = csv.reader(file)
             for row in reader:
-                if len(row) >= 14:
+                if len(row) >= 10:
                     kettle = Kettle(
-                        int(row[0]),        # id
-                        row[1],             # model
-                        row[2],             # name
-                        int(row[3]),       # producer_id
-                        int(row[4]),       # color_id
-                        int(row[5]),       # material_id
-                        float(row[6]),     # power
-                        float(row[7]),       # capacity
-                        float(row[8]),     # price
-                        float(row[9]),       # stock_quantity
-                        float(row[10]),    # weight
-                        float(row[11]),      # height
-                        float(row[12]),      # width
-                        float(row[13])       # depth
+                        int(row[0]),      # id
+                        row[1],           # model_code
+                        row[2],           # name
+                        int(row[3]),      # producer_id
+                        int(row[4]),      # kettle_type_id
+                        int(row[5]),      # material_id
+                        int(row[6]),      # color_id
+                        float(row[7]),    # capacity
+                        float(row[8]),    # warranty_months
+                        float(row[9]),    # price
                     )
                     self.add(kettle)
 

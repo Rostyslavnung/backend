@@ -8,7 +8,7 @@
 <body>
     <script>
         fetch('http://localhost:5000/api/getKettlesJSON')
-  .then(response => response.json()) // or response.text(), etc.
+  .then(response => response.json())
   .then(data => {
     let content=``;
     for (let i=0;i<data.kettles.length;i++){
