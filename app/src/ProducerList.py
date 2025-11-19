@@ -1,4 +1,5 @@
-from app.src import BaseList, Producer
+from .BaseList import BaseList
+from .Producer import Producer
 import csv
 
 class ProducerList(BaseList):

@@ -1,4 +1,4 @@
-from app.src import BaseEntity
+from .BaseEntity import BaseEntity
 
 class Kettle(BaseEntity):
     def __init__(self, id, model_code, name, 

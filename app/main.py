@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, flash, abort
 from flask_login import LoginManager, login_user
 
-from app.api.api import api
-import app.src as src
+from api.api import api
+import src as src
 
 load_dotenv()
 
@@ -24,19 +24,19 @@ def load_user(user_id):
 @app.route('/ssr/kettles')
 def kettles_ssr():
     kettles = src.KettleList()
-    kettles.read_from_csv('app/data/kettles.csv')
+    kettles.read_from_csv('data/kettles.csv')
 
     producers = src.ProducerList()
-    producers.read_from_csv('app/data/producers.csv')
+    producers.read_from_csv('data/producers.csv')
 
     types_list = src.KettleTypeList()
-    types_list.read_from_csv('app/data/kettleTypes.csv')
+    types_list.read_from_csv('data/kettleTypes.csv')
 
     colors_list = src.ColorList()
-    colors_list.read_from_csv('app/data/colors.csv')
+    colors_list.read_from_csv('data/colors.csv')
 
     materials_list = src.MaterialList()
-    materials_list.read_from_csv('app/data/materials.csv')
+    materials_list.read_from_csv('data/materials.csv')
 
     producer_map = {p.id: p.name for p in producers.get_all()}
     types_map = {t.id: t.name for t in types_list.get_all()}
@@ -96,7 +96,7 @@ def kettle_save():
     capacity = form.get('capacity')
     warranty_months = form.get('warranty_months')
     kettles = src.KettleList()
-    kettles.read_from_csv('app/data/kettles.csv')
+    kettles.read_from_csv('data/kettles.csv')
 
     if kettle_id: 
         for k in kettles.items:
@@ -129,27 +129,27 @@ def kettle_save():
         )
         kettles.add(new_kettle)
 
-    kettles.write_to_csv('app/data/kettles.csv')
+    kettles.write_to_csv('data/kettles.csv')
     flash("Зміни збережено!", "success")
     return redirect(url_for('kettles_ssr'))
 
 @app.route('/ssr/kettle_delete/<kettle_id>', methods=['POST'])
 def kettle_delete(kettle_id):
     kettles = src.KettleList()
-    kettles.read_from_csv('app/data/kettles.csv')
+    kettles.read_from_csv('data/kettles.csv')
 
     if kettles.delete(int(kettle_id)):
         flash("Чайник видалено!", "success")
     else:
         flash("Чайник не знайдено!", "warning")
 
-    kettles.write_to_csv('app/data/kettles.csv')
+    kettles.write_to_csv('data/kettles.csv')
     return redirect(url_for('kettles_ssr'))
 
 @app.route('/ssr/kettle_types')
 def types_ssr():
     kettle_types = src.KettleTypeList()
-    kettle_types.read_from_csv('app/data/kettleTypes.csv')
+    kettle_types.read_from_csv('data/kettleTypes.csv')
     return render_template('ssr_kettle_types.html',
                            kettle_types=kettle_types.get_all())
 
@@ -159,7 +159,7 @@ def type_save():
     type_id = form.get('id')
     name = form.get('name')
     types = src.KettleTypeList()
-    types.read_from_csv('app/data/kettleTypes.csv')
+    types.read_from_csv('data/kettleTypes.csv')
     
     if type_id: 
         for t in types.items:
@@ -177,27 +177,27 @@ def type_save():
         )
         types.add(new_type)
 
-    types.write_to_csv('app/data/kettleTypes.csv')
+    types.write_to_csv('data/kettleTypes.csv')
     flash("Зміни збережено!", "success")
     return redirect(url_for('types_ssr'))
 
 @app.route('/ssr/type_delete/<type_id>', methods=['POST'])
 def type_delete(type_id):
     types = src.KettleTypeList()
-    types.read_from_csv('app/data/kettleTypes.csv')
+    types.read_from_csv('data/kettleTypes.csv')
 
     if types.delete(int(type_id)):
         flash("Тип видалено!", "success")
     else:
         flash("Тип не знайдено!", "warning")
 
-    types.write_to_csv('app/data/kettleTypes.csv')
+    types.write_to_csv('data/kettleTypes.csv')
     return redirect(url_for('types_ssr'))
 
 @app.route('/ssr/colors')
 def colors_ssr():
     colors = src.ColorList()
-    colors.read_from_csv('app/data/colors.csv')
+    colors.read_from_csv('data/colors.csv')
     return render_template('ssr_colors.html',
                            colors=colors.get_all())
 
@@ -207,7 +207,7 @@ def color_save():
     color_id = form.get('id')
     name = form.get('name')
     colors = src.ColorList()
-    colors.read_from_csv('app/data/colors.csv')
+    colors.read_from_csv('data/colors.csv')
     
     if color_id: 
         for c in colors.items:
@@ -220,31 +220,30 @@ def color_save():
         new_id = str(len(colors.items) + 1)
         new_color = src.Color(
             id=new_id,
-            name=name,
-
+            name=name
         )
         colors.add(new_color)
 
-    colors.write_to_csv('app/data/colors.csv')
+    colors.write_to_csv('data/colors.csv')
     flash("Зміни збережено!", "success")
     return redirect(url_for('colors_ssr'))
 
 @app.route('/ssr/color_delete/<color_id>', methods=['POST'])
 def color_delete(color_id):
     colors = src.ColorList()
-    colors.read_from_csv('app/data/colors.csv')
+    colors.read_from_csv('data/colors.csv')
     if colors.delete(int(color_id)):
         flash("Колір видалено!", "success")
     else:
         flash("Колір не знайдено!", "warning")
 
-    colors.write_to_csv('app/data/colors.csv')
+    colors.write_to_csv('data/colors.csv')
     return redirect(url_for('colors_ssr'))
 
 @app.route('/ssr/materials')
 def materials_ssr():
     materials = src.MaterialList()
-    materials.read_from_csv('app/data/materials.csv')
+    materials.read_from_csv('data/materials.csv')
     return render_template('ssr_materials.html',
                            materials=materials.get_all())
 
@@ -254,7 +253,7 @@ def material_save():
     material_id = form.get('id')
     name = form.get('name')
     materials = src.MaterialList()
-    materials.read_from_csv('app/data/materials.csv')
+    materials.read_from_csv('data/materials.csv')
     
     if material_id: 
         for m in materials.items:
@@ -272,26 +271,26 @@ def material_save():
         )
         materials.add(new_material)
 
-    materials.write_to_csv('app/data/materials.csv')
+    materials.write_to_csv('data/materials.csv')
     flash("Зміни збережено!", "success")
     return redirect(url_for('materials_ssr'))
 
 @app.route('/ssr/material_delete/<material_id>', methods=['POST'])
 def material_delete(material_id):
     materials = src.MaterialList()
-    materials.read_from_csv('app/data/materials.csv')
+    materials.read_from_csv('data/materials.csv')
     if materials.delete(int(material_id)):
         flash("Матеріал видалено!", "success")
     else:
         flash("Матеріал не знайдено!", "warning")
 
-    materials.write_to_csv('app/data/materials.csv')
+    materials.write_to_csv('data/materials.csv')
     return redirect(url_for('materials_ssr'))
 
 @app.route('/ssr/producers')
 def producers_ssr():
     producers = src.ProducerList()
-    producers.read_from_csv('app/data/producers.csv')
+    producers.read_from_csv('data/producers.csv')
     return render_template('ssr_producers.html',
                            producers=producers.get_all())
 
@@ -301,7 +300,7 @@ def producer_save():
     producer_id = form.get('id')
     name = form.get('name')
     producers = src.ProducerList()
-    producers.read_from_csv('app/data/producers.csv')
+    producers.read_from_csv('data/producers.csv')
     
     if producer_id: 
         for p in producers.items:
@@ -319,21 +318,21 @@ def producer_save():
         )
         producers.add(new_producer)
 
-    producers.write_to_csv('app/data/producers.csv')
+    producers.write_to_csv('data/producers.csv')
     flash("Зміни збережено!", "success")
     return redirect(url_for('producers_ssr'))
 
 @app.route('/ssr/producer_delete/<producer_id>', methods=['POST'])
 def producer_delete(producer_id):
     producers = src.ProducerList()
-    producers.read_from_csv('app/data/producers.csv')
+    producers.read_from_csv('data/producers.csv')
 
     if producers.delete(int(producer_id)):
         flash("Виробник видалено!", "success")
     else:
         flash("Виробник не знайдено!", "warning")
 
-    producers.write_to_csv('app/data/producers.csv')
+    producers.write_to_csv('data/producers.csv')
     return redirect(url_for('producers_ssr'))
 
 

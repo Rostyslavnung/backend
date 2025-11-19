@@ -1,4 +1,5 @@
-from app.src import BaseList, Color
+from .BaseList import BaseList
+from .Color import Color
 import csv
 
 class ColorList(BaseList):

@@ -1,5 +1,5 @@
 from flask import jsonify, Blueprint
-from app.src import KettleList, KettleTypeList, ProducerList, MaterialList, ColorList
+from src import KettleList, KettleTypeList, ProducerList, MaterialList, ColorList
 import requests
 
 api = Blueprint('api', __name__)

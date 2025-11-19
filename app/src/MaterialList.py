@@ -1,4 +1,5 @@
-from app.src import BaseList, Material
+from .BaseList import BaseList
+from .Material import Material
 import csv
 
 class MaterialList(BaseList):

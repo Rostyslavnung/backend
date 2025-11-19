@@ -1,4 +1,5 @@
-from app.src import BaseList, Kettle
+from .BaseList import BaseList
+from .Kettle import Kettle
 import csv
 
 class KettleList(BaseList):
