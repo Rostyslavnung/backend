@@ -1,9 +1,11 @@
 import os
 
 from dotenv import load_dotenv
-from flask import Flask, render_template, request, redirect, url_for, flash, abort
-from flask_login import LoginManager, login_user
+from flask import Flask, render_template, request, redirect, session, url_for, flash
+from flask_login import LoginManager, login_user, logout_user, login_required
 
+from app.src.User import User
+from decorators import admin_required
 from api.api import api
 import src as src
 
@@ -17,12 +19,14 @@ login_manager.init_app(app)
 app.secret_key = os.getenv("SECRET_KEY")
 app.register_blueprint(api, url_prefix='/api')
 
+User(id=1, username="admin", password_hash="hashed_password_here", is_admin=True)
+
 @login_manager.user_loader
 def load_user(user_id):
     return src.User.get(user_id)
 
-@app.route('/ssr/kettles')
-def kettles_ssr():
+@app.route('/')
+def kettles():
     kettles = src.KettleList()
     kettles.read_from_csv('data/kettles.csv')
 
@@ -72,7 +76,7 @@ def kettles_ssr():
     materials = [m.name for m in materials_list.get_all()]
 
     return render_template(
-        'ssr_kettles.html',
+        'kettles.html',
         kettles=all_k,
         brands=brands,
         types=types,
@@ -82,7 +86,8 @@ def kettles_ssr():
         sort=sort
     )
 
-@app.route('/ssr/kettle_save', methods=['GET', 'POST'])
+@app.route('/kettle_save', methods=['GET', 'POST'])
+@admin_required
 def kettle_save():
     form = request.form
     kettle_id = form.get('id')
@@ -131,9 +136,10 @@ def kettle_save():
 
     kettles.write_to_csv('data/kettles.csv')
     flash("Зміни збережено!", "success")
-    return redirect(url_for('kettles_ssr'))
+    return redirect(url_for('kettles'))
 
-@app.route('/ssr/kettle_delete/<kettle_id>', methods=['POST'])
+@app.route('/kettle_delete/<kettle_id>', methods=['POST'])
+@admin_required
 def kettle_delete(kettle_id):
     kettles = src.KettleList()
     kettles.read_from_csv('data/kettles.csv')
@@ -144,16 +150,17 @@ def kettle_delete(kettle_id):
         flash("Чайник не знайдено!", "warning")
 
     kettles.write_to_csv('data/kettles.csv')
-    return redirect(url_for('kettles_ssr'))
+    return redirect(url_for('kettles'))
 
-@app.route('/ssr/kettle_types')
-def types_ssr():
+@app.route('/kettle_types')
+def types():
     kettle_types = src.KettleTypeList()
     kettle_types.read_from_csv('data/kettleTypes.csv')
-    return render_template('ssr_kettle_types.html',
+    return render_template('kettle_types.html',
                            kettle_types=kettle_types.get_all())
 
-@app.route('/ssr/kettle_type_save', methods=['GET', 'POST'])
+@app.route('/kettle_type_save', methods=['GET', 'POST'])
+@admin_required
 def type_save():
     form = request.form
     type_id = form.get('id')
@@ -179,9 +186,10 @@ def type_save():
 
     types.write_to_csv('data/kettleTypes.csv')
     flash("Зміни збережено!", "success")
-    return redirect(url_for('types_ssr'))
+    return redirect(url_for('types'))
 
-@app.route('/ssr/type_delete/<type_id>', methods=['POST'])
+@app.route('/type_delete/<type_id>', methods=['POST'])
+@admin_required
 def type_delete(type_id):
     types = src.KettleTypeList()
     types.read_from_csv('data/kettleTypes.csv')
@@ -192,16 +200,17 @@ def type_delete(type_id):
         flash("Тип не знайдено!", "warning")
 
     types.write_to_csv('data/kettleTypes.csv')
-    return redirect(url_for('types_ssr'))
+    return redirect(url_for('types'))
 
-@app.route('/ssr/colors')
-def colors_ssr():
+@app.route('/colors')
+def colors():
     colors = src.ColorList()
     colors.read_from_csv('data/colors.csv')
-    return render_template('ssr_colors.html',
+    return render_template('colors.html',
                            colors=colors.get_all())
 
-@app.route('/ssr/color_save', methods=['GET', 'POST'])
+@app.route('/color_save', methods=['GET', 'POST'])
+@admin_required
 def color_save():
     form = request.form
     color_id = form.get('id')
@@ -226,9 +235,10 @@ def color_save():
 
     colors.write_to_csv('data/colors.csv')
     flash("Зміни збережено!", "success")
-    return redirect(url_for('colors_ssr'))
+    return redirect(url_for('colors'))
 
-@app.route('/ssr/color_delete/<color_id>', methods=['POST'])
+@app.route('/color_delete/<color_id>', methods=['POST'])
+@admin_required
 def color_delete(color_id):
     colors = src.ColorList()
     colors.read_from_csv('data/colors.csv')
@@ -238,16 +248,17 @@ def color_delete(color_id):
         flash("Колір не знайдено!", "warning")
 
     colors.write_to_csv('data/colors.csv')
-    return redirect(url_for('colors_ssr'))
+    return redirect(url_for('colors'))
 
-@app.route('/ssr/materials')
-def materials_ssr():
+@app.route('/materials')
+def materials():
     materials = src.MaterialList()
     materials.read_from_csv('data/materials.csv')
-    return render_template('ssr_materials.html',
+    return render_template('materials.html',
                            materials=materials.get_all())
 
-@app.route('/ssr/material_save', methods=['GET', 'POST'])
+@app.route('/material_save', methods=['GET', 'POST'])
+@admin_required
 def material_save():
     form = request.form
     material_id = form.get('id')
@@ -273,9 +284,10 @@ def material_save():
 
     materials.write_to_csv('data/materials.csv')
     flash("Зміни збережено!", "success")
-    return redirect(url_for('materials_ssr'))
+    return redirect(url_for('materials'))
 
-@app.route('/ssr/material_delete/<material_id>', methods=['POST'])
+@app.route('/material_delete/<material_id>', methods=['POST'])
+@admin_required
 def material_delete(material_id):
     materials = src.MaterialList()
     materials.read_from_csv('data/materials.csv')
@@ -285,16 +297,17 @@ def material_delete(material_id):
         flash("Матеріал не знайдено!", "warning")
 
     materials.write_to_csv('data/materials.csv')
-    return redirect(url_for('materials_ssr'))
+    return redirect(url_for('materials'))
 
-@app.route('/ssr/producers')
-def producers_ssr():
+@app.route('/producers')
+def producers():
     producers = src.ProducerList()
     producers.read_from_csv('data/producers.csv')
-    return render_template('ssr_producers.html',
+    return render_template('producers.html',
                            producers=producers.get_all())
 
-@app.route('/ssr/producer_save', methods=['GET', 'POST'])
+@app.route('/producer_save', methods=['GET', 'POST'])
+@admin_required
 def producer_save():
     form = request.form
     producer_id = form.get('id')
@@ -320,9 +333,10 @@ def producer_save():
 
     producers.write_to_csv('data/producers.csv')
     flash("Зміни збережено!", "success")
-    return redirect(url_for('producers_ssr'))
+    return redirect(url_for('producers'))
 
-@app.route('/ssr/producer_delete/<producer_id>', methods=['POST'])
+@app.route('/producer_delete/<producer_id>', methods=['POST'])
+@admin_required
 def producer_delete(producer_id):
     producers = src.ProducerList()
     producers.read_from_csv('data/producers.csv')
@@ -333,21 +347,26 @@ def producer_delete(producer_id):
         flash("Виробник не знайдено!", "warning")
 
     producers.write_to_csv('data/producers.csv')
-    return redirect(url_for('producers_ssr'))
+    return redirect(url_for('producers'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    session.pop('_flashes', None)
     form = src.LoginForm()
     if form.validate_on_submit():
         user = src.User.get_by_username(form.username.data)
         if user and user.check_password(form.password.data):
             login_user(user)
             flash('Вхід успішний!', 'success')
-            next_page = request.args.get('next')
-            if not next_page:
-                return abort(404)
-            return redirect(next_page or url_for('index'))
+            return redirect(url_for('kettles'))
         else:
             flash('Невірне ім’я користувача або пароль', 'danger')
     return render_template('login.html', form=form)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Ви успішно вийшли з акаунта!', 'info')
+    return redirect(url_for('kettles'))

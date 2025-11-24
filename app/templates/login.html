@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вхід | MyApp</title>
+    <title>Вхід</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -69,7 +69,7 @@
             {{ form.submit(class="btn btn-login btn-primary btn-block") }}
         </div>
 
-        {% with messages = get_flashed_messages() %}
+        {% with messages = get_flashed_messages(category_filter=["info", "success", "warning", "danger"]) %}
             {% if messages %}
                 <div class="alert alert-info mt-3">
                     {% for message in messages %}

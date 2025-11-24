@@ -16,23 +16,28 @@
 <div class="container py-4">
 <div class="d-flex justify-content-between align-items-center mb-3">
   <div class="btn-group" role="group">
-    <a href="{{ url_for('kettles_ssr') }}" class="btn btn-outline-secondary">Чайники</a>
-    <a href="{{ url_for('producers_ssr') }}" class="btn btn-outline-secondary">Виробники</a>
-    <a href="{{ url_for('types_ssr') }}" class="btn btn-outline-secondary">Типи чайників</a>
-    <a href="{{ url_for('colors_ssr') }}" class="btn btn-outline-secondary">Кольори</a>
-    <a href="{{ url_for('materials_ssr') }}" class="btn btn-outline-secondary">Матеріали</a>
+    <a href="{{ url_for('kettles') }}" class="btn btn-outline-secondary">Чайники</a>
+    <a href="{{ url_for('producers') }}" class="btn btn-outline-secondary">Виробники</a>
+    <a href="{{ url_for('types') }}" class="btn btn-outline-secondary">Типи чайників</a>
+    <a href="{{ url_for('colors') }}" class="btn btn-outline-secondary">Кольори</a>
+    <a href="{{ url_for('materials') }}" class="btn btn-outline-secondary">Матеріали</a>
   </div>
-
-  <a href="{{ url_for('login') }}" class="btn btn-outline-primary">Увійти</a>
+  {% if current_user.is_authenticated %}
+    <a href="{{ url_for('logout') }}" class="btn btn-outline-primary">Вийти</a>
+  {% else %}
+    <a href="{{ url_for('login') }}" class="btn btn-outline-primary">Увійти</a>
+  {% endif %}
 </div>
 
   <div class="card p-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h5 class="mb-0">Список кольорів</h5>
+      {% if current_user.is_authenticated and current_user.is_admin %}
       <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#colorModal"
               onclick="openAddModal()">
         + Додати
       </button>
+      {% endif %}
     </div>
     {% if colors %}
       <div class="table-responsive">
@@ -46,6 +51,7 @@
                 <td>{{ loop.index }}</td>
                 <td>{{ c.name }}</td>
                 <td class="text-end">
+                  {% if current_user.is_authenticated and current_user.is_admin %}
                   <button class="btn btn-sm btn-warning me-1"
                           data-color='{{ c.to_dict() | tojson | safe }}'
                           onclick="openEditModal(this)"
@@ -55,6 +61,7 @@
                   <form method="POST" action="{{ url_for('color_delete', color_id=c.id) }}" class="d-inline">
                     <button class="btn btn-sm btn-danger" onclick="return confirm('Видалити цей колір?')">Видалити</button>
                   </form>
+                  {% endif %}
                 </td>
               </tr>
             {% endfor %}
