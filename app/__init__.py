@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 
 from src.User import User
 
+from database import init_db
+
 load_dotenv()
 
 login_manager = LoginManager()
@@ -15,6 +17,7 @@ def create_app():
 
     login_manager.init_app(app)
 
+    init_db()
     @login_manager.user_loader
     def load_user(user_id):
         return User.get(user_id)

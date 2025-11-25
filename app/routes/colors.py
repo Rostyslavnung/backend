@@ -8,7 +8,7 @@ colors_bp = Blueprint('colors_bp', __name__)
 @colors_bp.route('/colors')
 def colors():
     colors = src.ColorList()
-    colors.read_from_csv('data/colors.csv')
+    colors.read_from_db()
     return render_template('colors.html',
                            colors=colors.get_all())
 
@@ -19,36 +19,17 @@ def color_save():
     color_id = form.get('id')
     name = form.get('name')
     colors = src.ColorList()
-    colors.read_from_csv('data/colors.csv')
     
     if color_id: 
-        for c in colors.items:
-            if str(c.id) == str(color_id):
-                c.update(name=name)
-                break
-        else:
-            flash("Не знайдено колір для редагування!", "warning")
+        colors.update_in_db(color_id, name)
     else:
-        new_id = str(len(colors.items) + 1)
-        new_color = src.Color(
-            id=new_id,
-            name=name
-        )
-        colors.add(new_color)
+        colors.add_to_db(name)
 
-    colors.write_to_csv('data/colors.csv')
-    flash("Зміни збережено!", "success")
     return redirect(url_for('colors_bp.colors'))
 
 @colors_bp.route('/color_delete/<color_id>', methods=['POST'])
 @admin_required
 def color_delete(color_id):
     colors = src.ColorList()
-    colors.read_from_csv('data/colors.csv')
-    if colors.delete(int(color_id)):
-        flash("Колір видалено!", "success")
-    else:
-        flash("Колір не знайдено!", "warning")
-
-    colors.write_to_csv('data/colors.csv')
+    colors.delete_from_db(color_id)
     return redirect(url_for('colors_bp.colors'))
