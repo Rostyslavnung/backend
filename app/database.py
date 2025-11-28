@@ -42,28 +42,28 @@ def create_tables():
     cur.execute("""
     CREATE TABLE IF NOT EXISTS producers (
         id BIGSERIAL PRIMARY KEY,
-        name VARCHAR(50) NOT NULL
+        name VARCHAR(50) UNIQUE NOT NULL
     );
     """)
 
     cur.execute("""
     CREATE TABLE IF NOT EXISTS colors (
         id SMALLSERIAL PRIMARY KEY,
-        name VARCHAR(30) NOT NULL
+        name VARCHAR(30) UNIQUE NOT NULL
     );
     """)
 
     cur.execute("""
     CREATE TABLE IF NOT EXISTS materials (
         id SMALLSERIAL PRIMARY KEY,
-        name VARCHAR(30) NOT NULL
+        name VARCHAR(30) UNIQUE NOT NULL
     );
     """)
 
     cur.execute("""
     CREATE TABLE IF NOT EXISTS kettle_types (
         id SMALLSERIAL PRIMARY KEY,
-        type_name VARCHAR(20) NOT NULL
+        name VARCHAR(20) UNIQUE NOT NULL
     );
     """)
 
@@ -74,11 +74,11 @@ def create_tables():
         name VARCHAR(50) NOT NULL,
         producer_id BIGINT NOT NULL REFERENCES producers(id) ON DELETE RESTRICT,
         kettle_type_id SMALLINT REFERENCES kettle_types(id) ON DELETE RESTRICT,
-        capacity NUMERIC(5,2),
         material_id SMALLINT REFERENCES materials(id) ON DELETE RESTRICT,
         color_id SMALLINT REFERENCES colors(id) ON DELETE RESTRICT,
-        price NUMERIC(12,2),
+        capacity NUMERIC(5,2),
         warranty_months INT,
+        price NUMERIC(12,2),
         release_date DATE,
         icon BYTEA
     );

@@ -28,7 +28,8 @@ class ColorList(BaseList):
         cur.close()
         conn.close()
 
-    def add_to_db(self, name):
+    @staticmethod
+    def add_to_db(name):
         conn = get_connection()
         cur = conn.cursor()
         cur.execute(
@@ -41,7 +42,8 @@ class ColorList(BaseList):
         conn.close()
         return new_id
 
-    def update_in_db(self, color_id, name):
+    @staticmethod
+    def update_in_db(color_id, name):
         conn = get_connection()
         cur = conn.cursor()
         cur.execute(
@@ -52,7 +54,8 @@ class ColorList(BaseList):
         cur.close()
         conn.close()
 
-    def delete_from_db(self, color_id):
+    @staticmethod
+    def delete_from_db(color_id):
         conn = get_connection()
         cur = conn.cursor()
         cur.execute(

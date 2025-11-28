@@ -7,19 +7,19 @@ kettles_bp = Blueprint('kettles_bp', __name__)
 @kettles_bp.route('/')
 def kettles():
     kettles = src.KettleList()
-    kettles.read_from_csv('data/kettles.csv')
+    kettles.read_from_db()
 
     producers = src.ProducerList()
-    producers.read_from_csv('data/producers.csv')
+    producers.read_from_db()
 
     types_list = src.KettleTypeList()
-    types_list.read_from_csv('data/kettleTypes.csv')
+    types_list.read_from_db()
 
     colors_list = src.ColorList()
-    colors_list.read_from_csv('data/colors.csv')
+    colors_list.read_from_db()
 
     materials_list = src.MaterialList()
-    materials_list.read_from_csv('data/materials.csv')
+    materials_list.read_from_db()
 
     producer_map = {p.id: p.name for p in producers.get_all()}
     types_map = {t.id: t.name for t in types_list.get_all()}
@@ -80,53 +80,29 @@ def kettle_save():
     capacity = form.get('capacity')
     warranty_months = form.get('warranty_months')
     kettles = src.KettleList()
-    kettles.read_from_csv('data/kettles.csv')
+    kettles.read_from_db()
+    kettle = src.Kettle(
+        id=int(kettle_id) if kettle_id else None,
+        name=name,
+        price=price,
+        producer_id=producer,
+        model_code=model,
+        kettle_type_id=kettle_type_id,
+        color_id=color_id,
+        material_id=material_id,
+        capacity=capacity,
+        warranty_months=warranty_months,
+    )
 
     if kettle_id: 
-        for k in kettles.items:
-            if str(k.id) == str(kettle_id):
-                k._name = name
-                k._price = price
-                k._producer_id = producer
-                k._model_code = model
-                k._kettle_type_id = kettle_type_id
-                k._color_id = color_id
-                k._material_id = material_id
-                k._capacity = capacity
-                k._warranty_months = warranty_months
-                break
-        else:
-            flash("Не знайдено чайник для редагування!", "warning")
+        src.KettleList.update_in_db(kettle)
     else:
-        new_id = str(len(kettles.items) + 1)
-        new_kettle = src.Kettle(
-            id=new_id,
-            name=name,
-            price=price,
-            producer_id=producer,
-            model_code=model,
-            kettle_type_id=kettle_type_id,
-            color_id=color_id,
-            material_id=material_id,
-            capacity=capacity,
-            warranty_months=warranty_months,
-        )
-        kettles.add(new_kettle)
+        src.KettleList.add_to_db(kettle)
 
-    kettles.write_to_csv('data/kettles.csv')
-    flash("Зміни збережено!", "success")
     return redirect(url_for('kettles_bp.kettles'))
 
 @kettles_bp.route('/kettle_delete/<kettle_id>', methods=['POST'])
 @admin_required
 def kettle_delete(kettle_id):
-    kettles = src.KettleList()
-    kettles.read_from_csv('data/kettles.csv')
-
-    if kettles.delete(int(kettle_id)):
-        flash("Чайник видалено!", "success")
-    else:
-        flash("Чайник не знайдено!", "warning")
-
-    kettles.write_to_csv('data/kettles.csv')
+    src.KettleList.delete_from_db(int(kettle_id))
     return redirect(url_for('kettles_bp.kettles'))

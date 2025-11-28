@@ -28,7 +28,37 @@ class Kettle(BaseEntity):
     @property
     def price(self):
         return self._price
+
+    @price.setter
+    def price(self, value):
+        if value < 0:
+            raise ValueError("Price can't be negative")
+        self._price = value
+
+    @property
+    def kettle_type_id(self):
+        return self._kettle_type_id
     
+    @property
+    def material_id(self):
+        return self._material_id
+    
+    @property
+    def color_id(self):
+        return self._color_id
+
+    @property
+    def model_code(self):
+        return self._model_code
+
+    @property
+    def warranty_months(self):
+        return self._warranty_months
+
+    @property
+    def producer_id(self):
+        return self._producer_id
+
     @price.setter
     def price(self, value):
         if value < 0:
