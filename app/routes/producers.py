@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
+import psycopg2
 from app.decorators import admin_required
 import src as src
 
@@ -20,13 +21,19 @@ def producer_save():
     
     if producer_id: 
         src.ProducerList.update_in_db(producer_id, name)
+        flash("Виробника успішно оновлено.", "success")
     else:
         src.ProducerList.add_to_db(name)
+        flash("Виробника успішно додано.", "success")
 
     return redirect(url_for('producers_bp.producers'))
 
 @producers_bp.route('/producer_delete/<producer_id>', methods=['POST'])
 @admin_required
 def producer_delete(producer_id):
-    src.ProducerList.delete_from_db(producer_id)
+    try:
+        src.ProducerList.delete_from_db(producer_id)
+    except psycopg2.errors.ForeignKeyViolation:
+        flash("Неможливо видалити виробника, бо існують чайники, що на нього посилаються.", "danger")
+
     return redirect(url_for('producers_bp.producers'))

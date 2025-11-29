@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
+import psycopg2
 from app.decorators import admin_required
 import src as src
 
@@ -20,13 +21,19 @@ def material_save():
     
     if material_id: 
         src.MaterialList.update_in_db(material_id, name)
+        flash("Матеріал успішно оновлено.", "success")
     else:
         src.MaterialList.add_to_db(name)
+        flash("Матеріал успішно додано.", "success")
 
     return redirect(url_for('materials_bp.materials'))
 
 @materials_bp.route('/material_delete/<material_id>', methods=['POST'])
 @admin_required
 def material_delete(material_id):
-    src.MaterialList.delete_from_db(material_id)
+    try:
+        src.MaterialList.delete_from_db(material_id)
+    except psycopg2.errors.ForeignKeyViolation:
+        flash("Неможливо видалити матеріал, бо існують чайники, що на нього посилаються.", "danger")
+
     return redirect(url_for('materials_bp.materials'))

@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, flash, render_template, request, redirect, url_for
+import psycopg2
 from app.decorators import admin_required
 import src as src
 
@@ -21,13 +22,19 @@ def color_save():
     
     if color_id: 
         src.ColorList.update_in_db(color_id, name)
+        flash("Колір успішно оновлено.", "success")
     else:
         src.ColorList.add_to_db(name)
+        flash("Колір успішно додано.", "success")
 
     return redirect(url_for('colors_bp.colors'))
 
 @colors_bp.route('/color_delete/<color_id>', methods=['POST'])
 @admin_required
 def color_delete(color_id):
-    src.ColorList.delete_from_db(color_id)
+    try:
+        src.ColorList.delete_from_db(color_id)
+    except psycopg2.errors.ForeignKeyViolation:
+        flash("Неможливо видалити колір, бо існують чайники, що на нього посилаються.", "danger")
+
     return redirect(url_for('colors_bp.colors'))
