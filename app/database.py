@@ -92,7 +92,7 @@ def create_tables():
 def create_default_admin():
     from app.src.User import User, create_user
     if not User.get_by_username("admin"):
-        create_user("admin", "admin123", is_admin=True)
+        create_user("admin", "admin", is_admin=True)
 
 
 def init_db():

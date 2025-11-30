@@ -1,10 +1,9 @@
-import psycopg2
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.database import get_connection
 
 class User(UserMixin):
-    def __init__(self, id, username, password_hash, is_admin):
+    def __init__(self, id, username, password_hash = None, is_admin = False):
         self.id = id
         self.username = username
         self.password_hash = password_hash
@@ -48,6 +47,13 @@ class User(UserMixin):
         row = cur.fetchone()
         conn.close()
         return User(*row) if row else None
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'is_admin': self.is_admin
+        }
         
 def load_user(user_id):
     conn = get_connection()

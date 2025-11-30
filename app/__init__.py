@@ -32,6 +32,7 @@ def create_app():
     from routes.materials import materials_bp
     from routes.producers import producers_bp
     from routes.auth import auth_bp
+    from routes.users import users_bp
     from api.api import api
 
     app.register_blueprint(kettles_bp)
@@ -40,6 +41,7 @@ def create_app():
     app.register_blueprint(materials_bp)
     app.register_blueprint(producers_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(users_bp)
     app.register_blueprint(api, url_prefix="/api")
 
     return app
