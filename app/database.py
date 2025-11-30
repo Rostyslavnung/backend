@@ -1,36 +1,28 @@
 import psycopg2
-import os
-from dotenv import load_dotenv
-load_dotenv()
-
-DB_NAME = os.getenv("DB_NAME")
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT")
-
+from flask import current_app
 
 def get_connection(dbname=None):
-    return psycopg2.connect(
-        database=dbname or DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        host=DB_HOST,
-        port=DB_PORT
-    )
+    config = current_app.config
 
+    return psycopg2.connect(
+        database=dbname or config["DB_NAME"],
+        user=config["DB_USER"],
+        password=config["DB_PASSWORD"],
+        host=config["DB_HOST"],
+        port=config["DB_PORT"],
+    )
 
 def create_database_if_not_exists():
     conn = get_connection("defaultdb")
     conn.autocommit = True
     cur = conn.cursor()
 
-    cur.execute("SELECT 1 FROM pg_database WHERE datname = %s", (DB_NAME,))
+    cur.execute("SELECT 1 FROM pg_database WHERE datname = %s", (current_app.config["DB_NAME"],))
     exists = cur.fetchone()
 
     if not exists:
-        cur.execute(f"CREATE DATABASE {DB_NAME}")
-        print(f"Database '{DB_NAME}' created.")
+        cur.execute(f"CREATE DATABASE {current_app.config['DB_NAME']}")
+        print(f"Database '{current_app.config['DB_NAME']}' created.")
 
     conn.close()
 
@@ -84,11 +76,28 @@ def create_tables():
     );
     """)
 
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id BIGSERIAL PRIMARY KEY,
+        username VARCHAR(50) UNIQUE NOT NULL,
+        password_hash VARCHAR(255) NOT NULL,
+        is_admin BOOLEAN DEFAULT FALSE
+    );
+    """)
+
     conn.commit()
     conn.close()
     print("Tables checked/created.")
 
+def create_default_admin():
+    from app.src.User import User, create_user
+    if not User.get_by_username("admin"):
+        create_user("admin", "admin123", is_admin=True)
+
 
 def init_db():
-    create_database_if_not_exists()
-    create_tables()
+    from flask import current_app
+    with current_app.app_context():
+        create_database_if_not_exists()
+        create_tables()
+        create_default_admin()
