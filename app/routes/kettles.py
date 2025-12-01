@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
+import psycopg2
 from app.decorators import admin_required
 import src as src
 
@@ -93,11 +94,17 @@ def kettle_save():
     )
 
     if kettle_id: 
-        src.KettleList.update_in_db(kettle)
-        flash("Чайник успішно оновлено.", "success")
+        try:
+            src.KettleList.update_in_db(kettle)
+            flash("Чайник успішно оновлено.", "success")
+        except psycopg2.errors.UniqueViolation:
+            flash(f"Помилка при оновленні чайника, чайник із такою назвою уже існує", "danger")
     else:
-        src.KettleList.add_to_db(kettle)
-        flash("Чайник успішно додано.", "success")
+        try:
+            src.KettleList.add_to_db(kettle)
+            flash("Чайник успішно додано.", "success")
+        except psycopg2.errors.UniqueViolation:
+            flash(f"Помилка при додаванні чайника, чайник із такою назвою уже існує", "danger")
 
     return redirect(url_for('kettles_bp.kettles'))
 

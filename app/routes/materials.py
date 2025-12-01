@@ -19,12 +19,18 @@ def material_save():
     material_id = form.get('id')
     name = form.get('name')
     
-    if material_id: 
-        src.MaterialList.update_in_db(material_id, name)
-        flash("Матеріал успішно оновлено.", "success")
+    if material_id:
+        try: 
+            src.MaterialList.update_in_db(material_id, name)
+            flash("Матеріал успішно оновлено.", "success")
+        except psycopg2.errors.UniqueViolation:
+            flash(f"Помилка при оновленні матеріалу, матеріал із такою назвою уже існує", "danger")
     else:
-        src.MaterialList.add_to_db(name)
-        flash("Матеріал успішно додано.", "success")
+        try:
+            src.MaterialList.add_to_db(name)
+            flash("Матеріал успішно додано.", "success")
+        except psycopg2.errors.UniqueViolation:
+            flash(f"Помилка при додаванні матеріалу, матеріал із такою назвою уже існує", "danger")
 
     return redirect(url_for('materials_bp.materials'))
 

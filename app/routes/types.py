@@ -20,11 +20,17 @@ def type_save():
     name = form.get('name')
     
     if type_id: 
-        src.KettleTypeList.update_in_db(type_id, name)
-        flash("Тип чайника успішно оновлено.", "success")
+        try:
+            src.KettleTypeList.update_in_db(type_id, name)
+            flash("Тип чайника успішно оновлено.", "success")
+        except psycopg2.errors.UniqueViolation:
+            flash(f"Помилка при оновленні типу чайника, тип чайника із такою назвою уже існує", "danger")
     else:
-        src.KettleTypeList.add_to_db(name)
-        flash("Тип чайника успішно додано.", "success")
+        try:
+            src.KettleTypeList.add_to_db(name)
+            flash("Тип чайника успішно додано.", "success")
+        except psycopg2.errors.UniqueViolation:
+            flash(f"Помилка при додаванні типу чайника, тип чайника із такою назвою уже існує", "danger")
 
     return redirect(url_for('types_bp.types'))
 

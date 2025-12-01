@@ -21,8 +21,11 @@ def user_save():
     is_admin = True if form.get('is_admin') == 'on' else False
     
     if user_id: 
-        src.UserList.update_in_db(user_id, username, is_admin)
-        flash("Користувача успішно оновлено.", "success")
+        try:
+            src.UserList.update_in_db(user_id, username, is_admin)
+            flash("Користувача успішно оновлено.", "success")
+        except psycopg2.errors.UniqueViolation:
+            flash(f"Помилка при оновленні користувача, користувач із таким ім'ям уже існує", "danger")
     else:
         flash("Не знайдено користувача.", "danger")
     return redirect(url_for('users_bp.users'))

@@ -21,11 +21,17 @@ def color_save():
     name = form.get('name')
     
     if color_id: 
-        src.ColorList.update_in_db(color_id, name)
-        flash("Колір успішно оновлено.", "success")
+        try:
+            src.ColorList.update_in_db(color_id, name)
+            flash("Колір успішно оновлено.", "success")
+        except psycopg2.errors.UniqueViolation:
+            flash(f"Помилка при оновленні кольору, колір із такою назвою уже існує", "danger")
     else:
-        src.ColorList.add_to_db(name)
-        flash("Колір успішно додано.", "success")
+        try:
+            src.ColorList.add_to_db(name)
+            flash("Колір успішно додано.", "success")
+        except psycopg2.errors.UniqueViolation:
+            flash(f"Помилка при додаванні кольору, колір із такою назвою уже існує", "danger")
 
     return redirect(url_for('colors_bp.colors'))
 

@@ -20,11 +20,17 @@ def producer_save():
     name = form.get('name')
     
     if producer_id: 
-        src.ProducerList.update_in_db(producer_id, name)
-        flash("Виробника успішно оновлено.", "success")
+        try:
+            src.ProducerList.update_in_db(producer_id, name)
+            flash("Виробника успішно оновлено.", "success")
+        except psycopg2.errors.UniqueViolation:
+            flash(f"Помилка при оновленні виробника, виробник із такою назвою уже існує", "danger")
     else:
-        src.ProducerList.add_to_db(name)
-        flash("Виробника успішно додано.", "success")
+        try:
+            src.ProducerList.add_to_db(name)
+            flash("Виробника успішно додано.", "success")
+        except psycopg2.errors.UniqueViolation:
+            flash(f"Помилка при додаванні виробника, виробник із такою назвою уже існує", "danger")
 
     return redirect(url_for('producers_bp.producers'))
 
