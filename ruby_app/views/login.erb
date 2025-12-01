@@ -1,0 +1,27 @@
+<% content_for :title do %>Вхід<% end %>
+
+<div class="container py-5 d-flex align-items-center justify-content-center" style="min-height:60vh;">
+  <div class="login-card bg-white p-4" style="border-radius:16px; max-width:420px; width:100%; box-shadow:0 8px 20px rgba(0,0,0,0.1)">
+    <h2 class="text-center mb-4">Авторизація</h2>
+
+    <% if flash[:warning] %>
+      <div class="alert alert-warning"><%= flash[:warning] %></div>
+    <% end %>
+
+    <form method="POST" action="/auth/login" novalidate>
+      <div class="mb-3">
+        <label class="form-label">Ім’я користувача</label>
+        <input class="form-control" name="username" placeholder="Введіть ім’я користувача" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Пароль</label>
+        <input class="form-control" name="password" type="password" placeholder="Введіть пароль" required>
+      </div>
+
+      <div class="d-grid">
+        <button class="btn btn-login btn-primary">Увійти</button>
+      </div>
+    </form>
+  </div>
+</div>
