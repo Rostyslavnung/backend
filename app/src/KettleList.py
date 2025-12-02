@@ -27,11 +27,36 @@ class KettleList(BaseList):
         xml_items = [item.get_as_xml() for item in self._items]
         return "<kettles>\n" + "\n".join(xml_items) + "\n</kettles>"
 
-    def read_from_db(self):
+    def read_from_db(self, q=None, sort='name'):
         conn = get_connection()
         cur = conn.cursor()
 
-        cur.execute("SELECT * FROM kettles ORDER BY id")
+        base_sql = (
+            "SELECT k.id, k.model_code, k.name, k.producer_id, k.kettle_type_id, "
+            "k.material_id, k.color_id, k.capacity, k.warranty_months, k.price "
+            "FROM kettles k "
+            "LEFT JOIN producers p ON p.id = k.producer_id "
+            "LEFT JOIN kettle_types kt ON kt.id = k.kettle_type_id "
+            "LEFT JOIN materials m ON m.id = k.material_id "
+            "LEFT JOIN colors c ON c.id = k.color_id"
+        )
+
+        params = []
+        if q:
+            like = f"%{q}%"
+            where = (
+                " WHERE (k.name ILIKE %s OR k.model_code ILIKE %s OR "
+                "p.name ILIKE %s OR kt.name ILIKE %s OR m.name ILIKE %s OR c.name ILIKE %s)"
+            )
+            base_sql += where
+            params.extend([like] * 6)
+
+        if sort == 'price':
+            base_sql += " ORDER BY k.price"
+        else:
+            base_sql += " ORDER BY LOWER(k.name)"
+
+        cur.execute(base_sql, tuple(params))
         rows = cur.fetchall()
 
         self._items = [Kettle(id=row[0], model_code=row[1], name=row[2], producer_id=row[3], kettle_type_id=row[4], material_id=row[5], color_id=row[6], capacity=row[7], warranty_months=row[8], price=row[9]) for row in rows]

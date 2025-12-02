@@ -8,7 +8,11 @@ kettles_bp = Blueprint('kettles_bp', __name__)
 @kettles_bp.route('/')
 def kettles():
     kettles = src.KettleList()
-    kettles.read_from_db()
+
+    q = request.args.get('q', '').strip()
+    sort = request.args.get('sort', 'name')
+
+    kettles.read_from_db(q=q if q else None, sort=sort)
 
     producers = src.ProducerList()
     producers.read_from_db()
@@ -27,10 +31,6 @@ def kettles():
     colors_map = {c.id: c.name for c in colors_list.get_all()}
     materials_map = {m.id: m.name for m in materials_list.get_all()}
 
-    q = request.args.get('q', '').strip().lower()
-    producer = request.args.get('producer', '')
-    sort = request.args.get('sort', 'name')
-
     all_k = []
     for k in kettles.get_all():
         d = k.to_dict()
@@ -39,16 +39,6 @@ def kettles():
         d["color_name"] = colors_map.get(d["color_id"], "Невідомий")
         d["material_name"] = materials_map.get(d["material_id"], "Невідомий")
         all_k.append(d)
-
-    if q:
-        all_k = [k for k in all_k if q in (k.get('name') or '').lower()]
-    if producer:
-        all_k = [k for k in all_k if k.get('producer_id') == int(producer)]
-
-    if sort == 'price':
-        all_k.sort(key=lambda x: float(x.get('price') or 0))
-    else:
-        all_k.sort(key=lambda x: (x.get('name') or '').lower())
 
     producers = producers.get_all()
     types = types_list.get_all()
