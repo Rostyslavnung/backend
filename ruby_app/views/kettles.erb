@@ -1,211 +1,58 @@
 <% content_for :title do %>Чайники<% end %>
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 <div class="container py-4">
-  <% if flash.any? %>
-    <div class="container mb-3">
-      <% flash.each do |category, message| %>
-        <div class="alert alert-<%= category == :success ? 'success' : 'warning' %> alert-dismissible fade show" role="alert">
-          <%= message %>
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-      <% end %>
-    </div>
-  <% end %>
-
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div class="btn-group" role="group">
-      <a href="/kettles" class="btn btn-outline-secondary">Чайники</a>
-      <a href="/producers" class="btn btn-outline-secondary">Виробники</a>
-      <a href="/types" class="btn btn-outline-secondary">Типи чайників</a>
-      <a href="/colors" class="btn btn-outline-secondary">Кольори</a>
-      <a href="/materials" class="btn btn-outline-secondary">Матеріали</a>
-    </div>
-    <div class="btn-group" role="group">
-      <% if authenticated? %>
-        <a href="/auth/change_password" class="btn btn-outline-primary">Змінити пароль</a>
-        <a href="/auth/logout" class="btn btn-outline-primary">Вийти</a>
-      <% else %>
-        <a href="/auth/login" class="btn btn-outline-primary">Увійти</a>
-      <% end %>
-    </div>
-  </div>
-
-  <div class="card p-3 mb-4">
-    <form method="GET" class="row g-2 align-items-center">
-      <div class="col-sm-4">
-        <input name="q" value="<%= params['q'] %>" class="form-control" placeholder="Пошук за назвою...">
-      </div>
-      <div class="col-sm-3">
-        <select id="filterProducer" name="producer" class="form-select">
-          <option value="">Усі виробники</option>
-          <% @producers.all.each do |p| %>
-            <option value="<%= p.id %>" <%= 'selected' if params['producer'] && params['producer'].to_s == p.id.to_s %>><%= p.name %></option>
-          <% end %>
-        </select>
-      </div>
-      <div class="col-sm-3">
-        <select name="sort" class="form-select">
-          <option value="name" <%= 'selected' if params['sort'] == 'name' %>>За назвою</option>
-          <option value="price" <%= 'selected' if params['sort'] == 'price' %>>За ціною</option>
-        </select>
-      </div>
-      <div class="col-sm-2 d-grid">
-        <button class="btn btn-primary" type="submit">Застосувати</button>
-      </div>
-    </form>
-  </div>
-
   <div class="card p-3">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5 class="mb-0">Список чайників</h5>
-      <% if authenticated? %>
-        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#kettleModal" onclick="openAddModal()">+ Додати</button>
-      <% end %>
-    </div>
-
+    <h5 class="mb-3">Список чайників</h5>
     <% if @kettles && @kettles.all.any? %>
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead class="table-light">
-            <tr>
-              <th>#</th>
-              <th>Назва</th>
-              <th>Виробник</th>
-              <th>Ціна</th>
-              <th class="text-end"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @kettles.all.each_with_index do |k, idx| %>
-              <tr>
-                <td><%= idx + 1 %></td>
-                <td><%= k.name %></td>
-                <td><%= k.producer_name || '-' %></td>
-                <td><%= k.price || '-' %></td>
-                <td class="text-end">
-                  <button class="btn btn-sm btn-outline-info me-1" data-kettle='<%= k.to_hash.to_json %>' onclick="openDetailsModal(this)" data-bs-toggle="modal" data-bs-target="#detailsModal">Детальніше</button>
-                  <% if authenticated? %>
-                    <button class="btn btn-sm btn-warning me-1" data-kettle='<%= k.to_hash.to_json %>' onclick="openEditModal(this)" data-bs-toggle="modal" data-bs-target="#kettleModal">Редагувати</button>
-                    <form method="POST" action="/kettles/delete/<%= k.id %>" class="d-inline">
-                      <button class="btn btn-sm btn-danger" onclick="return confirm('Видалити цей чайник?')">Видалити</button>
-                    </form>
-                  <% end %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
+      <ul class="list-group">
+        <% @kettles.all.each do |k| %>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <%= k.model_code %>
+              <%= k.name %>
+              <% if k.producer_name %>
+                <span class="text-muted"> - <%= k.producer_name %></span>
+              <% end %>
+            </div>
+            <button class="btn btn-sm btn-outline-info" data-kettle='<%= k.to_hash.to_json %>' onclick="openDetailsModal(this)" data-bs-toggle="modal" data-bs-target="#detailsModal">
+              <i class="bi bi-info-circle"></i>
+            </button>
+          </li>
+        <% end %>
+      </ul>
     <% else %>
-      <div class="alert alert-warning mb-0">Нічого не знайдено</div>
+      <div class="alert alert-warning">Нічого не знайдено</div>
     <% end %>
   </div>
 </div>
 
-<!-- kettle modal (add/edit) -->
-<div class="modal fade" id="kettleModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <form method="POST" action="/kettles/save">
-        <div class="modal-header">
-          <h5 class="modal-title" id="kettleModalLabel">Додати чайник</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрити"></button>
-        </div>
-        <div class="modal-body">
-          <input type="hidden" name="id" id="kettleId">
-          <div class="mb-3">
-            <label class="form-label">Модель</label>
-            <input type="text" class="form-control" name="model" id="kettleModel" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Назва</label>
-            <input type="text" class="form-control" name="name" id="kettleName" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Ціна</label>
-            <input type="number" class="form-control" name="price" id="kettlePrice" min="0" step="0.01">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Виробник</label>
-            <select id="kettleProducer" name="producer" class="form-select" required>
-              <option value="">Усі виробники</option>
-              <% @producers.all.each do |p| %>
-                <option value="<%= p.id %>"><%= p.name %></option>
-              <% end %>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Тип</label>
-            <select id="kettleType" name="type" class="form-select" required>
-              <option value="">Усі типи</option>
-              <% @types.all.each do |t| %>
-                <option value="<%= t.id %>"><%= t.name %></option>
-              <% end %>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Колір</label>
-            <select id="kettleColor" name="color" class="form-select" required>
-              <option value="">Усі кольори</option>
-              <% @colors.all.each do |c| %>
-                <option value="<%= c.id %>"><%= c.name %></option>
-              <% end %>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Матеріал</label>
-            <select id="kettleMaterial" name="material" class="form-select" required>
-              <option value="">Усі матеріали</option>
-              <% @materials.all.each do |m| %>
-                <option value="<%= m.id %>"><%= m.name %></option>
-              <% end %>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Об'єм</label>
-            <input type="number" class="form-control" name="capacity" id="kettleCapacity" step="0.01" min="0">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Гарантія</label>
-            <input type="number" class="form-control" name="warranty_months" id="kettleWarranty" step="1" min="0">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
-          <button type="submit" class="btn btn-primary">Зберегти</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- details modal -->
+<!-- Details Modal -->
 <div class="modal fade" id="detailsModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="detailsModalLabel">Деталі</h5>
+        <h5 class="modal-title" id="detailsModalLabel">Деталі чайника</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрити"></button>
       </div>
       <div class="modal-body">
         <dl class="row">
-          <dt class="col-sm-4">Модель</dt>
+          <dt class="col-sm-4">Модель:</dt>
           <dd class="col-sm-8" id="d_model">-</dd>
-          <dt class="col-sm-4">Назва</dt>
+          <dt class="col-sm-4">Назва:</dt>
           <dd class="col-sm-8" id="d_name">-</dd>
-          <dt class="col-sm-4">Ціна</dt>
+          <dt class="col-sm-4">Ціна:</dt>
           <dd class="col-sm-8" id="d_price">-</dd>
-          <dt class="col-sm-4">Виробник</dt>
+          <dt class="col-sm-4">Виробник:</dt>
           <dd class="col-sm-8" id="d_producer">-</dd>
-          <dt class="col-sm-4">Тип</dt>
+          <dt class="col-sm-4">Тип:</dt>
           <dd class="col-sm-8" id="d_type">-</dd>
-          <dt class="col-sm-4">Колір</dt>
+          <dt class="col-sm-4">Колір:</dt>
           <dd class="col-sm-8" id="d_color">-</dd>
-          <dt class="col-sm-4">Матеріал</dt>
+          <dt class="col-sm-4">Матеріал:</dt>
           <dd class="col-sm-8" id="d_material">-</dd>
-          <dt class="col-sm-4">Об'єм</dt>
+          <dt class="col-sm-4"><%= "Об'єм:" %></dt>
           <dd class="col-sm-8" id="d_capacity">-</dd>
-          <dt class="col-sm-4">Гарантія</dt>
+          <dt class="col-sm-4">Гарантія:</dt>
           <dd class="col-sm-8" id="d_warranty">-</dd>
         </dl>
       </div>
@@ -217,42 +64,20 @@
 </div>
 
 <script>
-  function openAddModal() {
-    document.getElementById('kettleModalLabel').textContent = 'Додати чайник';
-    const ids = ['kettleId','kettleModel','kettleName','kettlePrice','kettleProducer','kettleType','kettleColor','kettleMaterial','kettleCapacity','kettleWarranty'];
-    ids.forEach(id=>{ const el=document.getElementById(id); if(!el) return; if(el.tagName==='SELECT'||el.type==='select-one') el.selectedIndex=0; else el.value=''; });
-  }
-
-  function openEditModal(buttonOrElem) {
-    const data = (buttonOrElem && buttonOrElem.dataset && buttonOrElem.dataset.kettle) ? buttonOrElem.dataset.kettle : null;
+  function openDetailsModal(button) {
+    const data = button.dataset.kettle;
     if (!data) return;
-    const kettle = JSON.parse(data);
-    document.getElementById('kettleModalLabel').textContent = 'Редагувати чайник';
-    document.getElementById('kettleId').value = kettle.id || '';
-    document.getElementById('kettleModel').value = kettle.model_code || '';
-    document.getElementById('kettleName').value = kettle.name || '';
-    document.getElementById('kettlePrice').value = kettle.price || '';
-    const setSelect=(id,value)=>{const s=document.getElementById(id); if(!s) return; for(let i=0;i<s.options.length;i++){ if(s.options[i].value===(value===undefined?'':String(value))){ s.selectedIndex=i; return; } } s.selectedIndex=0; };
-    setSelect('kettleProducer', kettle.producer_id);
-    setSelect('kettleType', kettle.kettle_type_id);
-    setSelect('kettleColor', kettle.color_id);
-    setSelect('kettleMaterial', kettle.material_id);
-    document.getElementById('kettleCapacity').value = kettle.capacity || '';
-    document.getElementById('kettleWarranty').value = kettle.warranty_months || kettle.warranty || '';
-  }
-
-  function openDetailsModal(buttonOrElem) {
-    const data = (buttonOrElem && buttonOrElem.dataset && buttonOrElem.dataset.kettle) ? buttonOrElem.dataset.kettle : null;
-    if (!data) return; const k = JSON.parse(data);
-    document.getElementById('detailsModalLabel').textContent = k.name || 'Деталі';
+    const k = JSON.parse(data);
+    
+    document.getElementById('detailsModalLabel').textContent = k.name || 'Деталі чайника';
     document.getElementById('d_model').textContent = k.model_code || '-';
     document.getElementById('d_name').textContent = k.name || '-';
-    document.getElementById('d_price').textContent = ((k.price!==undefined && k.price!==null)? k.price : '-') + ' грн.';
+    document.getElementById('d_price').textContent = (k.price !== undefined && k.price !== null) ? k.price + ' грн.' : '-';
     document.getElementById('d_producer').textContent = k.producer_name || '-';
     document.getElementById('d_type').textContent = k.type_name || '-';
     document.getElementById('d_color').textContent = k.color_name || '-';
     document.getElementById('d_material').textContent = k.material_name || '-';
-    document.getElementById('d_capacity').textContent = (k.capacity || '-') + ' л.';
-    document.getElementById('d_warranty').textContent = (k.warranty_months || k.warranty || '-') + ' міс.';
+    document.getElementById('d_capacity').textContent = k.capacity ? k.capacity + ' л.' : '-';
+    document.getElementById('d_warranty').textContent = k.warranty_months ? k.warranty_months + ' міс.' : '-';
   }
 </script>

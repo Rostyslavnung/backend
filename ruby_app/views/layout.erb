@@ -18,20 +18,12 @@
       </button>
       <div class="collapse navbar-collapse" id="navMain">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link" href="/kettles">Чайники</a></li>
+          <li class="nav-item"><a class="nav-link" href="/">Чайники</a></li>
           <li class="nav-item"><a class="nav-link" href="/producers">Виробники</a></li>
           <li class="nav-item"><a class="nav-link" href="/types">Типи</a></li>
           <li class="nav-item"><a class="nav-link" href="/colors">Кольори</a></li>
           <li class="nav-item"><a class="nav-link" href="/materials">Матеріали</a></li>
         </ul>
-        <div class="d-flex">
-          <% if authenticated? %>
-            <a class="btn btn-outline-primary me-2" href="/auth/change_password">Змінити пароль</a>
-            <a class="btn btn-outline-primary" href="/auth/logout">Вийти</a>
-          <% else %>
-            <a class="btn btn-outline-primary" href="/auth/login">Увійти</a>
-          <% end %>
-        </div>
       </div>
     </div>
   </nav>

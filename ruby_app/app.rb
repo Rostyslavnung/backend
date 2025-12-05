@@ -21,9 +21,7 @@ class ClearInvalidSession
     begin
       @app.call(env)
     rescue => e
-      # Detect invalid HMAC/session cookie errors and retry without cookies
       if e.message =~ /HMAC is invalid|Session cookie encryptor error/i
-        # remove cookies so the session is recreated
         env.delete('HTTP_COOKIE')
         return @app.call(env)
       end
@@ -50,7 +48,6 @@ end
 helpers do
   def current_user
     return nil unless session[:user_id]
-    # Lazy-load User model if present
     if defined?(User)
       User.find(session[:user_id])
     else

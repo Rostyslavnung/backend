@@ -23,20 +23,20 @@ class Kettle < BaseEntity
 
   def to_hash
     {
-      id: id,
-      model_code: model_code,
-      name: name,
-      price: price,
-      producer_id: producer_id,
-      kettle_type_id: kettle_type_id,
-      color_id: color_id,
-      material_id: material_id,
-      capacity: capacity,
-      warranty_months: warranty_months,
-      producer_name: producer_name,
-      type_name: type_name,
-      color_name: color_name,
-      material_name: material_name
+      id: @id,
+      model_code: @model_code,
+      name: @name,
+      price: @price,
+      producer_id: @producer_id,
+      kettle_type_id: @kettle_type_id,
+      color_id: @color_id,
+      material_id: @material_id,
+      capacity: @capacity,
+      warranty_months: @warranty_months,
+      producer_name: @producer_name,
+      type_name: @type_name,
+      color_name: @color_name,
+      material_name: @material_name
     }
   end
 end

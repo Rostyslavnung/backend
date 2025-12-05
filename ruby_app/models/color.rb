@@ -9,19 +9,7 @@ class Color < BaseEntity
     @name = name
   end
 
-  def to_s
-    "Color ID: #{@id}, Name: #{@name}"
-  end
-
-  def update(name: nil)
-    @name = name if name
-  end
-
   def to_hash
     { id: id, name: name }
-  end
-
-  def to_xml
-    "<color><id>#{id}</id><name>#{CGI.escapeHTML(name.to_s)}</name></color>"
   end
 end

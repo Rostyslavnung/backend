@@ -7,7 +7,6 @@ gem 'sequel'
 gem 'pg'
 gem 'sqlite3'
 gem 'sinatra-flash'
-gem 'bcrypt'
 gem 'sinatra-contrib'
 
 gem "rackup", "~> 2.2"
