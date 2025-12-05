@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
+import psycopg2
 from app.decorators import admin_required
 import src as src
 
@@ -7,7 +8,7 @@ types_bp = Blueprint('types_bp', __name__)
 @types_bp.route('/kettle_types')
 def types():
     kettle_types = src.KettleTypeList()
-    kettle_types.read_from_csv('data/kettleTypes.csv')
+    kettle_types.read_from_db()
     return render_template('kettle_types.html',
                            kettle_types=kettle_types.get_all())
 
@@ -17,39 +18,28 @@ def type_save():
     form = request.form
     type_id = form.get('id')
     name = form.get('name')
-    types = src.KettleTypeList()
-    types.read_from_csv('data/kettleTypes.csv')
     
     if type_id: 
-        for t in types.items:
-            if str(t.id) == str(type_id):
-                t.update(name=name)
-                break
-        else:
-            flash("Не знайдено тип для редагування!", "warning")
+        try:
+            src.KettleTypeList.update_in_db(type_id, name)
+            flash("Тип чайника успішно оновлено.", "success")
+        except psycopg2.errors.UniqueViolation:
+            flash(f"Помилка при оновленні типу чайника, тип чайника із такою назвою уже існує", "danger")
     else:
-        new_id = str(len(types.items) + 1)
-        new_type = src.KettleType(
-            id=new_id,
-            name=name,
+        try:
+            src.KettleTypeList.add_to_db(name)
+            flash("Тип чайника успішно додано.", "success")
+        except psycopg2.errors.UniqueViolation:
+            flash(f"Помилка при додаванні типу чайника, тип чайника із такою назвою уже існує", "danger")
 
-        )
-        types.add(new_type)
-
-    types.write_to_csv('data/kettleTypes.csv')
-    flash("Зміни збережено!", "success")
     return redirect(url_for('types_bp.types'))
 
 @types_bp.route('/type_delete/<type_id>', methods=['POST'])
 @admin_required
 def type_delete(type_id):
-    types = src.KettleTypeList()
-    types.read_from_csv('data/kettleTypes.csv')
+    try:
+        src.KettleTypeList.delete_from_db(type_id)
+    except psycopg2.errors.ForeignKeyViolation:
+        flash("Неможливо видалити тип чайника, бо існують чайники, що на нього посилаються.", "danger")
 
-    if types.delete(int(type_id)):
-        flash("Тип видалено!", "success")
-    else:
-        flash("Тип не знайдено!", "warning")
-
-    types.write_to_csv('data/kettleTypes.csv')
     return redirect(url_for('types_bp.types'))

@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, session
-from flask_login import login_user, logout_user, login_required
+from flask import Blueprint, render_template, redirect, request, url_for, flash, session
+from flask_login import current_user, login_user, logout_user, login_required
+from app.src.User import User, create_user
 import src as src
 
 auth_bp = Blueprint('auth_bp', __name__)
@@ -24,3 +25,38 @@ def logout():
     logout_user()
     flash('Ви успішно вийшли з акаунта!', 'info')
     return redirect(url_for('kettles_bp.kettles'))
+
+@auth_bp.route('/change_password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    if request.method == 'POST':
+        old_password = request.form['old_password']
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+
+        if not current_user.check_password(old_password):
+            flash("Старий пароль введено невірно", "danger")
+        elif new_password != confirm_password:
+            flash("Паролі не збігаються", "danger")
+        else:
+            current_user.set_password(new_password)
+            flash("Пароль успішно змінено", "success")
+            return redirect(url_for('kettles_bp.kettles'))
+
+    return render_template("change_password.html")
+
+@auth_bp.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        if User.get_by_username(username):
+            flash("Користувач з таким ім'ям вже існує", "danger")
+            return redirect(url_for("auth_bp.register"))
+
+        create_user(username, password)
+        flash("Користувача успішно створено", "success")
+        return redirect(url_for("auth_bp.login"))
+
+    return render_template("register.html")

@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, flash, render_template, request, redirect, url_for
+import psycopg2
 from app.decorators import admin_required
 import src as src
 
@@ -8,7 +9,7 @@ colors_bp = Blueprint('colors_bp', __name__)
 @colors_bp.route('/colors')
 def colors():
     colors = src.ColorList()
-    colors.read_from_csv('data/colors.csv')
+    colors.read_from_db()
     return render_template('colors.html',
                            colors=colors.get_all())
 
@@ -18,37 +19,28 @@ def color_save():
     form = request.form
     color_id = form.get('id')
     name = form.get('name')
-    colors = src.ColorList()
-    colors.read_from_csv('data/colors.csv')
     
     if color_id: 
-        for c in colors.items:
-            if str(c.id) == str(color_id):
-                c.update(name=name)
-                break
-        else:
-            flash("Не знайдено колір для редагування!", "warning")
+        try:
+            src.ColorList.update_in_db(color_id, name)
+            flash("Колір успішно оновлено.", "success")
+        except psycopg2.errors.UniqueViolation:
+            flash(f"Помилка при оновленні кольору, колір із такою назвою уже існує", "danger")
     else:
-        new_id = str(len(colors.items) + 1)
-        new_color = src.Color(
-            id=new_id,
-            name=name
-        )
-        colors.add(new_color)
+        try:
+            src.ColorList.add_to_db(name)
+            flash("Колір успішно додано.", "success")
+        except psycopg2.errors.UniqueViolation:
+            flash(f"Помилка при додаванні кольору, колір із такою назвою уже існує", "danger")
 
-    colors.write_to_csv('data/colors.csv')
-    flash("Зміни збережено!", "success")
     return redirect(url_for('colors_bp.colors'))
 
 @colors_bp.route('/color_delete/<color_id>', methods=['POST'])
 @admin_required
 def color_delete(color_id):
-    colors = src.ColorList()
-    colors.read_from_csv('data/colors.csv')
-    if colors.delete(int(color_id)):
-        flash("Колір видалено!", "success")
-    else:
-        flash("Колір не знайдено!", "warning")
+    try:
+        src.ColorList.delete_from_db(color_id)
+    except psycopg2.errors.ForeignKeyViolation:
+        flash("Неможливо видалити колір, бо існують чайники, що на нього посилаються.", "danger")
 
-    colors.write_to_csv('data/colors.csv')
     return redirect(url_for('colors_bp.colors'))
