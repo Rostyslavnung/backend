@@ -1,4 +1,5 @@
 from flask import Blueprint, flash, render_template, request, redirect, url_for
+import psycopg2
 from app.decorators import admin_required
 import src as src
 
