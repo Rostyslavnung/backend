@@ -1,0 +1,16 @@
+<% content_for :title do %>Виробники<% end %>
+
+<div class="container py-4">
+  <div class="card p-3">
+    <h5 class="mb-3">Список виробників</h5>
+    <% if @producers && @producers.all.any? %>
+      <ul class="list-group">
+        <% @producers.all.each do |p| %>
+          <li class="list-group-item"><%= p.name %></li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="alert alert-warning">Нічого не знайдено</div>
+    <% end %>
+  </div>
+</div>

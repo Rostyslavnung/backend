@@ -1,0 +1,16 @@
+<% content_for :title do %>Кольори<% end %>
+
+<div class="container py-4">
+  <div class="card p-3">
+    <h5 class="mb-3">Список кольорів</h5>
+    <% if @colors && @colors.all.any? %>
+      <ul class="list-group">
+        <% @colors.all.each do |c| %>
+          <li class="list-group-item"><%= c.name %></li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="alert alert-warning">Нічого не знайдено</div>
+    <% end %>
+  </div>
+</div>
