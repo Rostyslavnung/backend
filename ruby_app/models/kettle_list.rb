@@ -3,7 +3,7 @@ require_relative 'kettle'
 require_relative '../config/database'
 
 class KettleList < BaseList
-  def read_from_db(q: nil, producer: nil, sort: nil)
+  def read_from_db()
     pk = Sequel.qualify(:kettles, :id)
     select_cols = [
       Sequel.qualify(:kettles, :id).as(:id),
@@ -28,23 +28,6 @@ class KettleList < BaseList
           .left_join(:kettle_types, Sequel[:kettle_types][:id] => Sequel[:kettles][:kettle_type_id])
           .left_join(:colors, Sequel[:colors][:id] => Sequel[:kettles][:color_id])
           .left_join(:materials, Sequel[:materials][:id] => Sequel[:kettles][:material_id])
-
-    if producer && !producer.to_s.empty?
-      ds = ds.where(Sequel.qualify(:kettles, :producer_id) => producer.to_i)
-    end
-
-    if q && !q.to_s.strip.empty?
-      term = "%#{q.strip}%"
-      conds = Sequel.|(
-        Sequel.ilike(Sequel.qualify(:kettles, :name), term),
-        Sequel.ilike(Sequel.qualify(:kettles, :model_code), term),
-        Sequel.ilike(Sequel.qualify(:producers, :name), term),
-        Sequel.ilike(Sequel.qualify(:kettle_types, :name), term),
-        Sequel.ilike(Sequel.qualify(:colors, :name), term),
-        Sequel.ilike(Sequel.qualify(:materials, :name), term)
-      )
-      ds = ds.where(conds)
-    end
 
     @items = ds.all.map do |r|
       Kettle.new(r[:id],

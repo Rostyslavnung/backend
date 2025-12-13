@@ -2,7 +2,6 @@ GEM
   remote: https://rubygems.org/
   specs:
     base64 (0.3.0)
-    bcrypt (3.1.20)
     bigdecimal (3.3.1)
     logger (1.7.0)
     multi_json (1.17.0)
@@ -72,7 +71,6 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
-  bcrypt
   pg
   puma (~> 7.1)
   rackup (~> 2.2)

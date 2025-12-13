@@ -7,10 +7,6 @@ require_relative '../models/color_list'
 require_relative '../models/material_list'
 
 get '/' do
-  q = params['q']
-  producer = params['producer']
-  sort = params['sort'] || 'name'
-
   @producers = ProducerList.new
   @producers.read_from_db
 
